@@ -1,4 +1,4 @@
-﻿disp("Hello World: Working with voltage dividers");
+disp("Hello World: Working with voltage dividers");
 
 bR = 4670;          % Big resistor in Ohm
 sR = 326;           % Small resistor in Ohm
@@ -13,7 +13,7 @@ disp("Maximum input voltage = ");
 disp(max_input);
 
 resolution = 2^10;
-disp("Resolution = ");
+disp("\nResolution = ");
 disp(resolution);
 
 disp("Voltage resolution = ");
@@ -23,7 +23,7 @@ disp(max_input / resolution);
 voltage = 6;
 lDev = 1;
 uDev = 1.5;
-disp("Battery voltage = ");
+disp("\nBattery voltage = ");
 disp(voltage);
 
 input = voltage - lDev;
@@ -43,7 +43,7 @@ voltage = voltage * 2;
 lDev = lDev * 2;
 uDev = uDev * 2;
 
-disp("Battery voltage = ");
+disp("\nBattery voltage = ");
 disp(voltage);
 
 input = voltage - lDev;
@@ -62,7 +62,7 @@ voltage = voltage * 2;
 lDev = lDev * 2;
 uDev = uDev * 2;
 
-disp("Battery voltage = ");
+disp("\nBattery voltage = ");
 disp(voltage);
 
 input = voltage - lDev;
@@ -81,7 +81,7 @@ voltage = voltage * 2;
 lDev = lDev * 2;
 uDev = uDev * 2;
 
-disp("Battery voltage = ");
+disp("\nBattery voltage = ");
 disp(voltage);
 
 input = voltage - lDev;
@@ -94,5 +94,11 @@ output = input * (sR / (sR + bR));
 disp("Upper bound output = ");
 disp(output);
 
-
-
+disp("\n\nLimiting current for a zener diode as a reference voltage:");
+% Supply voltage of the Arduion
+supply_voltage = 5;
+% The disired current in Amps
+iLim = 0.015;
+rLim =  supply_voltage / iLim;
+disp("Current limiting Resistance: ");
+disp(rLim);
