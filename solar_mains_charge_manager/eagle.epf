@@ -352,7 +352,7 @@ UsedLibrary="/run/user/1000/gvfs/sftp:host=server/home/dyuman/Desktop/eagle-8.4.
 
 [Win_1]
 Type="Control Panel"
-Loc="0 0 1199 639"
+Loc="0 27 1199 666"
 State=2
 Number=0
 
