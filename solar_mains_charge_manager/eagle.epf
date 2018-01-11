@@ -348,11 +348,10 @@ UsedLibraryUrn="urn:adsk.eagle:library:174"
 UsedLibraryUrn="urn:adsk.eagle:library:175"
 UsedLibraryUrn="urn:adsk.eagle:library:176"
 UsedLibraryUrn="urn:adsk.eagle:library:177"
-UsedLibrary="/run/user/1000/gvfs/sftp:host=server/home/dyuman/Desktop/eagle-8.4.1/lbr/Arduino-clone.lbr"
 
 [Win_1]
 Type="Control Panel"
-Loc="0 27 1199 666"
+Loc="0 0 1199 639"
 State=2
 Number=0
 
