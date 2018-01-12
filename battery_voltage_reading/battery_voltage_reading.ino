@@ -68,8 +68,17 @@ void loop() {
   static float bV = 0;
   bV = batteryVoltage(measured / 1024 * 3.3, sR, bR);
   Serial.println("");
-  Serial.print("Measured:\t\t");
+  Serial.print("Measured bV:\t\t");
   Serial.print(bV);
+
+  measured = analogRead(A0);
+  static float pV = 0;
+  bV = 12.3;
+  pV = ((bV - (measured / 1024 * 3.3)) / 14.33) + (bV - (measured / 1024 * 3.3));
+  Serial.println("");
+  Serial.print("Measured pV:\t\t");
+  Serial.print(pV);
+  
   if (bV < 11.7) {
     digitalWrite(13, 1);
   }
