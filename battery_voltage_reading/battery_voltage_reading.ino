@@ -26,7 +26,7 @@
 
 // the setup function runs once when you press reset or power the board
 void setup() {
-  Serial.begin(38400);
+  Serial.begin(9600);
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(A0, INPUT);
   pinMode(A1, INPUT);
@@ -58,25 +58,30 @@ float supplyVoltage() {
 // the loop function runs over and over again forever
 void loop() {
   // Resistance of the small resistor
-  static int sR = 326;
+  static int bsR = 326;
   // Resistance of the big resistor
-  static int bR = 4670;
+  static int bbR = 4670;
   // Measured voltage
   static float measured = 0;
+  static int pmsR = 1000;
+  static int pmbR = 150;
 
   measured = analogRead(A0);
   static float bV = 0;
-  bV = batteryVoltage(measured / 1024 * 3.3, sR, bR);
+  bV = batteryVoltage(measured / 1024 * 3.3, bsR, bbR);
   Serial.println("");
   Serial.print("Measured bV:\t\t");
   Serial.print(bV);
 
-  measured = analogRead(A0);
+  measured = analogRead(A1);
   static float pV = 0;
-  bV = 12.3;
-  pV = ((bV - (measured / 1024 * 3.3)) / 14.33) + (bV - (measured / 1024 * 3.3));
-  Serial.println("");
-  Serial.print("Measured pV:\t\t");
+  //bV = 12.3;
+  //pV = (((measured) - 26.6) / (165 / 1165)) - bV;
+  pV = (measured / 1024 * 3.3);// - 3.3) * (pmsR + pmbR) / pmbR + 3.3;
+  Serial.print("\tMeasured pV:\t\t\t");
+  Serial.print(pV);
+  pV = ((measured / 1024 * 3.3) - 3.3) * (pmsR + pmbR) / pmbR;// + 3.3;
+  Serial.print("\tVoltage at Vp-:\t\t\t");
   Serial.print(pV);
   
   if (bV < 11.7) {
