@@ -29,7 +29,7 @@ void setup() {
   Serial.begin(9600);
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(A0, INPUT);
-  pinMode(A1, INPUT);
+  //pinMode(A1, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
   analogReference(EXTERNAL);
 
@@ -47,13 +47,14 @@ float batteryVoltage(float measured, int sR, int bR) {
 /**
  * Return the true voltage of the 5~V source.
  */
-float supplyVoltage() {
+/*
+ float supplyVoltage() {
   float zenerExpected = 3.3;
   float zenerMeasured = analogRead(A1);
 //  float ratio = zenerMeasured / zenerExpected;
   return zenerMeasured * zenerExpected;
 }
-
+*/
 
 // the loop function runs over and over again forever
 void loop() {
@@ -63,16 +64,19 @@ void loop() {
   static int bbR = 4670;
   // Measured voltage
   static float measured = 0;
+  /*
   static int pmsR = 1000;
   static int pmbR = 150;
+  */
 
   measured = analogRead(A0);
   static float bV = 0;
   bV = batteryVoltage(measured / 1024 * 3.3, bsR, bbR);
   Serial.println("");
-  Serial.print("Measured bV:\t\t");
+  Serial.print("Measured bV:\t");
   Serial.print(bV);
 
+  /*
   measured = analogRead(A1);
   static float pV = 0;
   //bV = 12.3;
@@ -83,12 +87,15 @@ void loop() {
   pV = ((measured / 1024 * 3.3) - 3.3) * (pmsR + pmbR) / pmbR;// + 3.3;
   Serial.print("\tVoltage at Vp-:\t\t\t");
   Serial.print(pV);
+  */
   
-  if (bV < 11.7) {
+  if (bV < 23.4) {
     digitalWrite(13, 1);
+    Serial.print("\t\tMains:\t1");
   }
-  if (bV > 13) {
+  if (bV > 26) {
     digitalWrite(13, 0);
+    Serial.print("\t\tMains:\t0");
   }
 //  Serial.print("\treading:\t\t");
 //  Serial.print(measured);  
