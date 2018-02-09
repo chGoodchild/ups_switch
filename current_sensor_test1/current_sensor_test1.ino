@@ -61,7 +61,9 @@ void loop() {
   static float measured = 0;
 
   measured = analogRead(A1);
-  static float initial = (measured / 1024 * 5);
+  // static float initial = (measured / 1024 * 5);
+  // static float initial = measured;
+  static float initial = 512;
 
   /*
   static int pmsR = 1000;
@@ -69,12 +71,12 @@ void loop() {
   */
 
   static float voltageDifference = 0;
-  voltageDifference = ((measured / 1024 * 5) - initial) * 1000;
+  voltageDifference = ((measured - initial) / 1024 * 5) * 1000;
   Serial.println("");
   Serial.print("Initial measurement:\t");
-  //Serial.print(initial);
+  Serial.print(initial);
   Serial.print("\tDifference:\t");
-  //Serial.print(voltageDifference);
+  Serial.print(voltageDifference);
   Serial.print("\tAmps:\t");
   static float current = 0;
   current = voltageDifference / 33;
