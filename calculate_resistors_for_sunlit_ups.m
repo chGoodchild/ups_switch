@@ -1,3 +1,5 @@
+% Battery percentage: https://scubaengineer.com/documents/lead_acid_battery_charging_graphs.pdf
+
 disp("Hello World: Working with voltage dividers");
 
 bR = 4670;          % Big resistor in Ohm
