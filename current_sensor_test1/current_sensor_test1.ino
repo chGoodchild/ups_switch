@@ -35,54 +35,33 @@ void setup() {
   // Configure serial
 }
 
-/**
- * Return the battery voltage given the measured voltage 
- * and the resistors in the voltage divider.
- */
-float batteryVoltage(float measured, int sR, int bR) {
-  return measured * (sR + bR) / sR;
-}
-
-/**
- * Return the true voltage of the 5~V source.
- */
-/*
- float supplyVoltage() {
-  float zenerExpected = 3.3;
-  float zenerMeasured = analogRead(A1);
-//  float ratio = zenerMeasured / zenerExpected;
-  return zenerMeasured * zenerExpected;
-}
-*/
 
 // the loop function runs over and over again forever
 void loop() {
   // Measured voltage
-  static float measured = 0;
+  static float measured0 = 0;
+  static float measured1 = 0;
+  static float measured2 = 0;
+  static float middle1 = analogRead(A0);
+  static float middle2 = analogRead(A1);
+  static float middle3 = analogRead(A2);
 
-  measured = analogRead(A1);
-  // static float initial = (measured / 1024 * 5);
-  // static float initial = measured;
-  static float initial = 512;
-
+  measured0 = (19 * measured0 + analogRead(A0))/20;
+  measured1 = (19 * measured1 + analogRead(A1))/20;
+  measured2 = (19 * measured2 + analogRead(A2))/20;
   /*
-  static int pmsR = 1000;
-  static int pmbR = 150;
+  Serial.print("A0:\t");
+  Serial.print(middle1);
+  Serial.print("\tA1:\t");
+  Serial.print(middle2);
+  Serial.print("\tA2:\t");
+  Serial.println(middle3);
   */
-
-  static float voltageDifference = 0;
-  voltageDifference = ((measured - initial) / 1024 * 5) * 1000;
-  Serial.println("");
-  Serial.print("Initial measurement:\t");
-  Serial.print(initial);
-  Serial.print("\tDifference:\t");
-  Serial.print(voltageDifference);
-  Serial.print("\tAmps:\t");
-  static float current = 0;
-  current = voltageDifference / 33;
-  static float averageCurrent = current;
-  averageCurrent = (0.9 * averageCurrent + 0.1 * current);
-  Serial.print(current);
-  Serial.print("\tAverage current:\t");
-  Serial.print(averageCurrent);
+  Serial.print("A0:\t");
+  Serial.print(((middle1 - measured0) / 1023 * 5) * 1000 / 33);
+  Serial.print("\tA1:\t");
+  Serial.print(((middle2 - measured1) / 1023 * 5) * 1000 / 33);
+  Serial.print("\tA2:\t");
+  Serial.println(((middle3 - measured2) / 1023 * 5) * 1000 / 33);
+  
 }
