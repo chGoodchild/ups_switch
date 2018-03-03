@@ -1,3 +1,6 @@
-An explanation to the voltage measurement problem: http://www.skillbank.co.uk/arduino/measure.htm
+An explanation of the voltage measurement problem: http://www.skillbank.co.uk/arduino/measure.htm
 
-Additionally we could take into account the current flowing into the analog input of the microcontroller...
+We could take into account the current flowing into the analog input of the microcontroller, but it's not significant:
+https://electronics.stackexchange.com/questions/67171/input-impedance-of-arduino-uno-analog-pins
+https://electronics.stackexchange.com/questions/141595/arduino-analogin-minimum-current
+
