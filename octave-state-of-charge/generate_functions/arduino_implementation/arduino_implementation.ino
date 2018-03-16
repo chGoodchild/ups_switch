@@ -145,7 +145,10 @@ float measure(float *measurements) {
       percent = percentage(V, I, C);
     }
 
+    // measurements[0] = (199 * measurements[0] + percent) / 200;
     measurements[0] = percent;
+    // measurements[1] = (19 * measurements[1] + V) / 20;
+    // measurements[2] = (19 * measurements[2] + I) / 20;
     measurements[1] = V;
     measurements[2] = I;
 }
