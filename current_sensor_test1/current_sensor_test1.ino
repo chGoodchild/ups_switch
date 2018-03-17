@@ -28,7 +28,7 @@
 void setup() {
   Serial.begin(9600);
   // initialize digital pin LED_BUILTIN as an output.
-  pinMode(A1, INPUT);
+  pinMode(A0, INPUT);
   //pinMode(A1, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
@@ -40,15 +40,15 @@ void setup() {
 void loop() {
   // Measured voltage
   static float measured0 = 0;
-  static float measured1 = 0;
-  static float measured2 = 0;
+//  static float measured1 = 0;
+//  static float measured2 = 0;
   static float middle1 = analogRead(A0);
-  static float middle2 = analogRead(A1);
-  static float middle3 = analogRead(A2);
+//  static float middle2 = analogRead(A1);
+//  static float middle3 = analogRead(A2);
 
   measured0 = (19 * measured0 + analogRead(A0))/20;
-  measured1 = (19 * measured1 + analogRead(A1))/20;
-  measured2 = (19 * measured2 + analogRead(A2))/20;
+//  measured1 = (19 * measured1 + analogRead(A1))/20;
+//  measured2 = (19 * measured2 + analogRead(A2))/20;
   /*
   Serial.print("A0:\t");
   Serial.print(middle1);
@@ -58,10 +58,10 @@ void loop() {
   Serial.println(middle3);
   */
   Serial.print("A0:\t");
-  Serial.print(((middle1 - measured0) / 1023 * 5) * 1000 / 33);
-  Serial.print("\tA1:\t");
-  Serial.print(((middle2 - measured1) / 1023 * 5) * 1000 / 33);
-  Serial.print("\tA2:\t");
-  Serial.println(((middle3 - measured2) / 1023 * 5) * 1000 / 33);
+  Serial.println(((middle1 - measured0) / 1023 * 5) * 1000 / 33);
+//  Serial.print("\tA1:\t");
+//  Serial.print(((middle2 - measured1) / 1023 * 5) * 1000 / 33);
+//  Serial.print("\tA2:\t");
+//  Serial.println(((middle3 - measured2) / 1023 * 5) * 1000 / 33);
   
 }
