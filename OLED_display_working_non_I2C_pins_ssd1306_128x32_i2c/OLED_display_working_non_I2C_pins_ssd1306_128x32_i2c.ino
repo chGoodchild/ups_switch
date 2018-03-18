@@ -52,9 +52,19 @@ int cnt = 0;
 const int fontSize = 15;
 static int enSW = 9;
 
+// @@@ most of the following don't actually need to be volatile
+// @@@ following three/four variables will need to be set when defining the battery voltage scale
+// Beware the combinations of values entered in the four variables, to avoid problems when "overflowing"
+// i.e. don't set min to 15 if step is 10 and val is 20 @@@ to be better phrased
+float fltPrmpt_max[] = {15,100,15,100,3,12};
+float fltPrmpt_min[] = {10,10,10,10,0.5,3};
+float fltPrmpt_step[] = {0.10,10,0.10,10,0.25,0.25};
+// @@@ change 12.5?
+volatile float fltPrmpt_val[] = {11,30,13.5,70,1,12};
 volatile int fn_run = 0;
 volatile int mode = 0;
-volatile bool in_submenu = 0;
+volatile bool topup = false;
+volatile bool need_to_calibrate = false;
 volatile int main_menu_item = 0;
 volatile int mode_menu_item = 0;
 volatile int cur_menu = -1;
@@ -162,6 +172,8 @@ void setup()   {
 void loop() {
   // @@@ is it interesting to understand why it didn't work calling the functions straight from
   // the ISR while using hardware I2C?
+
+  // @@@ verify the sanity of the order of things being done/checked in this main loop
   switch(fn_run) {
           case 1 :
             fn_run=0;
@@ -174,6 +186,26 @@ void loop() {
         }
   if (cur_menu == -1) {
    meas_loop();
+  }
+  if (topup) {
+    digitalWrite(6, HIGH);
+    // @@@ Take care of the topup over here
+    // @@@ Do we need to restore the relay to its previous state
+    // upon completion of the topup as well as upon cancellation?
+  } else {
+    // Do whatever has been set in the Mode menu
+    if (mode == 2) {
+      digitalWrite(6, HIGH);
+    } else if (mode == 1) {
+      digitalWrite(6, LOW);
+    } else if (mode == 0) {
+      // @@@ Check here for voltages/percentages/timings having reached thresholds/etc.
+    }
+  }
+  if (need_to_calibrate) {
+    // @@@ Write to EEPROM bit and reset the MCU
+    // @@@ There is a cleaner way to reset, I am sure
+    digitalWrite(12, LOW);
   }
 }
 
@@ -268,6 +300,15 @@ void scroll() {
         // @@@ replace the '4'
         displayMenu(mode_menu,4, mode_menu_item);
       }
+      if ((cur_menu >= 4) && (cur_menu <= 9)) {
+        int arr_i = cur_menu - 4;
+        fltPrmpt_val[arr_i] += fltPrmpt_step[arr_i];
+        // @@@ at the moment, if variable happens to contain out of bounds value as in too low, it does not get corrected. Ok?
+        if (fltPrmpt_val[arr_i] > fltPrmpt_max[arr_i]) {
+          fltPrmpt_val[arr_i] = fltPrmpt_min[arr_i];
+        }
+        fltPrmpt(main_menu[main_menu_item], fltPrmpt_val[arr_i]);
+      }
   }
   return;
 }
@@ -281,12 +322,10 @@ void select() {
         switch(main_menu_item) {
           case 0 :
             cur_menu = 1;
-            askConfirm(main_menu[main_menu_item]);
-            // @@@ TMP. The folllowing if statement and its contents need to be removed
-            if (digitalRead(6)) {
-              digitalWrite(6, LOW);
+            if (topup) {
+              askCancel(main_menu[main_menu_item]);              
             } else {
-              digitalWrite(6, HIGH);  
+              askConfirm(main_menu[main_menu_item]);              
             }
           break;
           case 1 :
@@ -299,32 +338,49 @@ void select() {
         
           break;
           case 3 :
-        
+            fltPrmpt(main_menu[main_menu_item], fltPrmpt_val[0]);
+            cur_menu = 4;
           break;
           case 4 :
-        
+            fltPrmpt(main_menu[main_menu_item], fltPrmpt_val[1]);
+            cur_menu = 5;        
           break;
           case 5 :
-        
+            fltPrmpt(main_menu[main_menu_item], fltPrmpt_val[2]);
+            cur_menu = 6;        
           break;
           case 6 :
-          
+            fltPrmpt(main_menu[main_menu_item], fltPrmpt_val[3]);
+            cur_menu = 7;          
           break;
           case 7 :
-        
+            fltPrmpt(main_menu[main_menu_item], fltPrmpt_val[4]);
+            cur_menu = 8;        
           break;
           case 8 :
-        
+            fltPrmpt(main_menu[main_menu_item], fltPrmpt_val[5]);
+            cur_menu = 9;        
           break;
           case 9 :
-        
+            cur_menu = 10;
+            askConfirm(main_menu[main_menu_item]);              
           break;
           case 10 :
             cur_menu = -1;
           break;
         }
       break;
-
+      case 1 :
+        // @@@ Confirm that the next line is sufficient/appropriate. Does this apply also to calibrate option?
+        // @@@ Also verify that this is the behavior we want, i.e. running topup at
+        // the moment overrides settings in "Mode". This might or might not be intuitive.
+        // @@@ Once topup has started, there needs to be a way to cancel it.
+        topup = !topup;
+        disMessage(main_menu[main_menu_item], " OK");
+        cur_menu = 0;
+        // @@@ replace the '11' and menu values
+        displayMenu(main_menu,11, main_menu_item);
+      break;
       case 2 :
         if (mode_menu_item < 3)
           {
@@ -334,6 +390,47 @@ void select() {
           // @@@ replace the '11'
           displayMenu(main_menu,11, main_menu_item);
       break;
+      case 4 :
+          // @@@ put the following two lines in a function, they get used often
+          cur_menu = 0;
+          // @@@ replace the '11'
+          displayMenu(main_menu,11, main_menu_item);          
+      break;
+      case 5 :
+          // @@@ put the following two lines in a function, they get used often
+          cur_menu = 0;
+          // @@@ replace the '11'
+          displayMenu(main_menu,11, main_menu_item);          
+      break;
+      case 6 :
+          // @@@ put the following two lines in a function, they get used often
+          cur_menu = 0;
+          // @@@ replace the '11'
+          displayMenu(main_menu,11, main_menu_item);          
+      break;
+      case 7 :
+          // @@@ put the following two lines in a function, they get used often
+          cur_menu = 0;
+          // @@@ replace the '11'
+          displayMenu(main_menu,11, main_menu_item);          
+      break;
+      case 8 :
+          // @@@ put the following two lines in a function, they get used often
+          cur_menu = 0;
+          // @@@ replace the '11'
+          displayMenu(main_menu,11, main_menu_item);          
+      break;
+      case 9 :
+          // @@@ put the following two lines in a function, they get used often
+          cur_menu = 0;
+          // @@@ replace the '11'
+          displayMenu(main_menu,11, main_menu_item);          
+      break;
+      case 10 :
+        disMessage(main_menu[main_menu_item], " OK");
+        need_to_calibrate = true;
+        // @@@ should we bother to return to main menu or not since we probably anyway will reset here?
+      break;
     }
 
     DebounceSnapshot = ticks;
@@ -341,7 +438,7 @@ void select() {
   return;
 }
 
-bool askConfirm(char title[9]) {
+void askConfirm(char title[9]) {
   display.clearDisplay();
   display.setCursor(0,0);
   display.print(" ");
@@ -350,9 +447,34 @@ bool askConfirm(char title[9]) {
   display.display();
 }
 
+void askCancel(char title[9]) {
+  display.clearDisplay();
+  display.setCursor(0,0);
+  display.print(" ");
+  display.println(title);
+  display.println(" Cancel?");
+  display.display();
+}
 
+void disMessage(char title[9], char message[9]) {
+  display.clearDisplay();
+  display.setCursor(0,0);
+  display.print(" ");
+  display.println(title);
+  display.println(message);
+  display.display();
+  delay(500);
+}
 
-
+void fltPrmpt(char title[9], float curValue) {
+  display.clearDisplay();
+  display.setCursor(0,0);
+  display.print(" ");
+  display.println(title);
+  display.print(" ");
+  display.println(curValue);
+  display.display();
+}
 
 // Measurement code as of 17/03/2018, tmp, to be removed @@@
 float calibration = 0;
