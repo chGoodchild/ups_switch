@@ -38,8 +38,13 @@ volatile uint32_t DebounceSnapshot;
 
 
 // Refference voltage
-//static float Vref = 5;
-static float Vref = 4.64;
+// static float Vref = 5;
+
+// MCP1702 in grace
+static float Vref = 4.99;
+
+// On USB in last school
+// static float Vref = 4.64;
   
 #define maxItemSize 9
 const int itemsPerScreen = 2;
