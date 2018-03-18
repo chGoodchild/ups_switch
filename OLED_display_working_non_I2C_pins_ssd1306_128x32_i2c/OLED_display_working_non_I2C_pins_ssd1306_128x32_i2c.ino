@@ -31,7 +31,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 #define DELTAY 2
 
 
-#define DEB_DELAY    1       // Debounce delay @@@ to be fine tuned
+#define DEB_DELAY    2       // Debounce delay @@@ to be fine tuned
 #define TIMER_SNAPSHOT_MS() ((ticks << 8) | TCNT0)
 volatile uint32_t ticks;
 volatile uint32_t DebounceSnapshot;
@@ -149,6 +149,8 @@ void setup()   {
 //  ticks = 0;
   cur_menu = -1;
   meas_setup();
+  // @@@ remove????
+  pinMode(6,OUTPUT);
 }
 
 
@@ -275,6 +277,12 @@ void select() {
           case 0 :
             cur_menu = 1;
             askConfirm(main_menu[main_menu_item]);
+            // @@@ TMP. The folllowing if statement and its contents need to be removed
+            if (digitalRead(6)) {
+              digitalWrite(6, LOW);
+            } else {
+              digitalWrite(6, HIGH);  
+            }
           break;
           case 1 :
             cur_menu = 2;
