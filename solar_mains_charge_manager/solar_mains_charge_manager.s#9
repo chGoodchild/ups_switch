@@ -9571,9 +9571,9 @@ W = angled&lt;p&gt;
 <pinref part="SV2" gate="G$1" pin="5"/>
 </segment>
 <segment>
-<pinref part="S2" gate="1" pin="S1"/>
-<wire x1="162.56" y1="81.28" x2="162.56" y2="83.82" width="0.1524" layer="91"/>
-<wire x1="162.56" y1="83.82" x2="152.4" y2="83.82" width="0.1524" layer="91"/>
+<pinref part="S2" gate="1" pin="S"/>
+<wire x1="160.02" y1="83.82" x2="152.4" y2="83.82" width="0.1524" layer="91"/>
+<wire x1="160.02" y1="81.28" x2="160.02" y2="83.82" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$8" class="0">

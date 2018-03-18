@@ -13745,11 +13745,13 @@ https://www.youtube.com/watch?v=Sri4Kd_5IKo</description>
 <segment>
 <wire x1="124.46" y1="17.78" x2="129.54" y2="17.78" width="0.1524" layer="91"/>
 <pinref part="X1" gate="-2" pin="S"/>
+<label x="129.54" y="17.78" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="D6"/>
 <wire x1="118.11" y1="73.66" x2="129.54" y2="73.66" width="0.1524" layer="91"/>
 <pinref part="SV2" gate="G$1" pin="7"/>
+<label x="119.38" y="73.66" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>

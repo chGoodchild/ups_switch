@@ -1,3 +1,6 @@
+// Refference voltage
+static float Vref = 5;
+
 float calibration = 0;
 // Capacity in AH
 float C = 26;
@@ -99,8 +102,6 @@ float batteryVoltage() {
   static int sR = 317;
   // Big resistor
   static int bR = 4590;
-  // Refference voltage
-  static float Vref = 5;
 
   return ((analogRead(A0) * Vref) / 1023) * (sR + bR) / sR;
 }
@@ -111,7 +112,7 @@ float batteryVoltage() {
  * Return the current in Amps.
  */
 float currentInAmps() {
-  return ((calibration - analogRead(A7)) / 1023 * 5) * 1000 / 33;
+  return ((calibration - analogRead(A7)) / 1023 * Vref) * 1000 / 33;
 }
 
 
