@@ -33,8 +33,8 @@ Adafruit_SSD1306 display(OLED_RESET);
 
 #define DEB_DELAY    2       // Debounce delay @@@ to be fine tuned
 #define TIMER_SNAPSHOT_MS() ((ticks << 8) | TCNT0)
-volatile uint32_t ticks;
-volatile uint32_t DebounceSnapshot;
+volatile uint32_t ticks;  // ###
+volatile uint32_t DebounceSnapshot;  // ###
 
 
 // Refference voltage
@@ -46,11 +46,11 @@ static float Vref = 4.99;
 // On USB in last school
 // static float Vref = 4.64;
   
-#define maxItemSize 9
-const int itemsPerScreen = 2;
-int cnt = 0; 
-const int fontSize = 15;
-static int enSW = 9;
+#define maxItemSize 9  // ###
+const int itemsPerScreen = 2;  // ###
+int cnt = 0;  // ###
+const int fontSize = 15;  // ###
+static int enSW = 9;  // ###
 
 // @@@ most of the following don't actually need to be volatile
 // @@@ following three/four variables will need to be set when defining the battery voltage scale
@@ -61,7 +61,7 @@ float fltPrmpt_min[] = {10,10,10,10,0.5,3};
 float fltPrmpt_step[] = {0.10,10,0.10,10,0.25,0.25};
 // @@@ change 12.5?
 volatile float fltPrmpt_val[] = {11,30,13.5,70,1,12};
-volatile int fn_run = 0;
+volatile int fn_run = 0; // ###
 volatile int mode = 0;
 volatile bool topup = false;
 volatile bool need_to_calibrate = false;
@@ -72,7 +72,7 @@ volatile char main_menu[][10] ={"Run topup\0","Mode\0","Bat. size\0","Ch. on V\0
 // @@@ is it necessary for the following to be volatile and/or global?
 volatile char mode_menu[][10] ={"Automatic\0","Off\0","On\0","Back\0"};
 
-
+// Pin number of the buttons
 const byte interruptPinScr = 8;
 const byte interruptPinSel = 9;
 
@@ -160,7 +160,7 @@ void setup()   {
   TIMSK1  = _BV(TOIE1);   /* enable the overflow interrupt */
 
   // @@@ replace the '11' and menu values
-  displayMenu(main_menu,11, main_menu_item);
+  //displayMenu(main_menu,11, main_menu_item);
 //  ticks = 0;
   cur_menu = -1;
   meas_setup();
@@ -184,6 +184,8 @@ void loop() {
             select();
           break;
         }
+  // @@@ we always want to measure. cur_menu checking should only affect displaying the values
+  // @@@ we should also display the current state of the relay
   if (cur_menu == -1) {
    meas_loop();
   }
@@ -463,7 +465,7 @@ void disMessage(char title[9], char message[9]) {
   display.println(title);
   display.println(message);
   display.display();
-  delay(500);
+  delay(275);
 }
 
 void fltPrmpt(char title[9], float curValue) {
@@ -604,7 +606,7 @@ float currentInAmps() {
  * Scale the battery voltage down to 12 Volts and return a 
  * standardized Array with percentage, voltage and current.
  */
-float measure(float *measurements) {
+void measure(float *measurements) {
     // Return [percentage, voltage, current]
     // Battery voltage pin: A0
     // Current: A7
@@ -623,17 +625,20 @@ float measure(float *measurements) {
     float I = currentInAmps();
 
     // Can't be right: scaling error
-    if (V < 8.5 || V > 15.5) {
+    if (V < 9.5 || V > 14.5) {
       percent = -3;
+      V = -3;
     } else {
       percent = percentage(V, I, C);
     }
 
+    // @@@ New unfiltered field for all error messages!
+    // @@@ New field for unscaled voltage
     measurements[0] = (199 * measurements[0] + percent) / 200;
     //measurements[0] = percent;
     measurements[1] = (19 * measurements[1] + V) / 20;
-    measurements[2] = (19 * measurements[2] + I) / 20;
     //measurements[1] = V;
+    measurements[2] = (19 * measurements[2] + I) / 20;
     //measurements[2] = I;
 }
 
