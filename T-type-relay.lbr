@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="6.6.0">
+<eagle version="8.4.1">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
+<setting keepoldvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.05" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.635" altunitdist="mm" altunit="mm"/>
+<grid distance="0.25" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="5" altunitdist="mil" altunit="mil"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -57,12 +58,20 @@
 <library>
 <packages>
 <package name="T-TYPE-RELAY-30A">
-<pad name="C1" x="0" y="0" drill="1.4" diameter="3.81"/>
-<pad name="COIL2" x="6.75" y="-3.8" drill="1.4" diameter="3.81"/>
-<pad name="COIL1" x="-8.45" y="-3.8" drill="1.4" diameter="3.81"/>
-<pad name="C2" x="-16.4" y="-29.4" drill="1.4" diameter="3.81"/>
-<pad name="NO" x="15.2" y="-34.65" drill="1.4" diameter="3.81"/>
-<pad name="NC" x="15.7" y="-45.45" drill="1.4" diameter="3.81"/>
+<pad name="C1" x="18.925" y="35.56" drill="1.8" diameter="4.5"/>
+<pad name="COIL2" x="24.085" y="33.265" drill="1" diameter="3"/>
+<pad name="COIL1" x="13.925" y="33.265" drill="1" diameter="3"/>
+<pad name="C2" x="28.08" y="20.63" drill="1.8" diameter="5"/>
+<pad name="NO" x="10" y="17.645" drill="1.85" diameter="5"/>
+<pad name="NC" x="10" y="10" drill="1.85" diameter="5"/>
+<wire x1="9.06" y1="40.39" x2="9.06" y2="21.26" width="0.127" layer="51"/>
+<wire x1="9.06" y1="21.26" x2="4.26" y2="21.26" width="0.127" layer="51"/>
+<wire x1="4.26" y1="21.26" x2="4.26" y2="6.76" width="0.127" layer="51"/>
+<wire x1="4.26" y1="6.76" x2="32.4" y2="6.76" width="0.127" layer="51"/>
+<wire x1="32.4" y1="6.76" x2="32.4" y2="26.94" width="0.127" layer="51"/>
+<wire x1="32.4" y1="26.94" x2="30.07" y2="26.94" width="0.127" layer="51"/>
+<wire x1="30.07" y1="26.94" x2="30.07" y2="40.39" width="0.127" layer="51"/>
+<wire x1="30.07" y1="40.39" x2="9.06" y2="40.39" width="0.127" layer="51"/>
 </package>
 </packages>
 <symbols>
