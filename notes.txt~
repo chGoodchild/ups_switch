@@ -1,3 +1,0 @@
-An explanation to the voltage measurement problem: http://www.skillbank.co.uk/arduino/measure.htm
-
-Additionally we could take into account the current flowing into the analog input of the microcontroller...
