@@ -1,0 +1,30 @@
+
+____________________________________________________________
+Switching module
+____________________________________________________________
+ - The output voltage becomes very high if GND is not 
+	connected/loose connection. This needs to be 
+	prevented or considdered by the user.
+
+____________________________________________________________
+Relay board
+____________________________________________________________
+ - Aurorica suggested some improvements regarding space 
+	between the traces and drill sizes. We have to ask 
+	him again...
+
+____________________________________________________________
+Main board
+____________________________________________________________
+ - Move solder pads from under display
+ - Relay RMC header not sufficient space
+ - Arduino header to GND header, not sufficient space
+ - More space for caps C1,C2/or smaller caps
+ - Arduino USB not accessible
+ - Flat resistor package too short
+ - Why is there a jumper between 5V and AREF? Ok to remove?
+ - GND of 3-pin header
+ - Display upside down, change??? or keep??
+ - screw holes too small
+ - add support for mechanical relay (header on the main board)
+
