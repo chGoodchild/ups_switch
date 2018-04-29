@@ -1,5 +1,17 @@
 //#include <TimerHelpers.h>
 
+// Display: Battery size settings Dyuman
+
+// EEPROM --> Calibration Ch
+// TNEB sensing Dy
+
+// Main logic (switching) - Later
+//  Time delay
+//  Percentage
+//  Bat voltage
+//  TNEB presence
+// Topup
+
 /*********************************************************************
 This is an example for our Monochrome OLEDs based on SSD1306 drivers
 
