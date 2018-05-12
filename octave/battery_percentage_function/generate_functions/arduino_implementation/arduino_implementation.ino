@@ -121,7 +121,8 @@ float currentInAmps() {
  * Scale the battery voltage down to 12 Volts and return a 
  * standardized Array with percentage, voltage and current.
  */
-float measure(float *measurements) {
+// float measure(float *measurements) {
+void measure(float *measurements) {
     // Return [percentage, voltage, current]
     // Battery voltage pin: A0
     // Current: A7
