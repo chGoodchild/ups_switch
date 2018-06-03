@@ -42,13 +42,31 @@ Adafruit_SSD1306 display(OLED_RESET);
 #define YPOS 1
 #define DELTAY 2
 
+// Pin definitions
+#define voltage_pin A0
+#define current_pin A7
+
 // @@@ Check the value
 const float scaling_err_LB = 9.5;
 
 // @@@ Check the value
 const float scaling_err_UB = 14.5;
 
+// Error messages
+const float no_error = 1;
+const float scaling_error = -1;
+const float V_LB_Error = -2;
+const float V_UB_Error = -3;
+const float perc_LB_Error = -4;
+const float perc_UB_Error = -5;
 
+// @@@ Check the following constants.
+// Error / Boundary constants
+const float scaling_boundary = 9.5;
+const float V_LB_Const = 8.5;
+const float V_UB_Const = 15.5;
+const float perc_LB_Cons = 15;
+const float perc_UB_Cons = 85;
 
 // @@@ Measure the measure time uppon the first measure...
 // @@@ Define the sleep time as 100 ms - measure time.
@@ -225,16 +243,16 @@ void setup()   {
   // single setup function in order to ensure that we don't 
   // use the same pin for two different things...
   // Voltage measurement
-  pinMode(A0, INPUT);
+  pinMode(voltage_pin, INPUT);
 
   // Current measurement
   // @@@ Flash the EEEPROM whenever a module is newly created or repurposed.
   // @@@ Set EEEProm and only initialize if it is not yet initialized
   // @@@ List the EEEProm addresses that are already in use (0, 1, 2) ---> Use #define / const
-  pinMode(A7, INPUT);
+  pinMode(current_pin, INPUT);
   if (!((EEPROM.read(0) == 56) && (EEPROM.read(1) == 194) && (EEPROM.read(2) == 42))) {
     // The EEPROM probably isn't configured yet.
-    calibration = analogRead(A7);
+    calibration = analogRead(current_pin);
 
     EEPROM.write(0, 56);
     EEPROM.write(1, 194);
@@ -256,8 +274,10 @@ void loop() {
   // BEGIN: Measure
 
   // @@@ we always want to measure. cur_menu checking should only affect displaying the values
-  static float measurements[3];
-  measure(&measurements[0]);
+  static float measurements[4];
+  static int error;
+  
+  error = measure(&measurements[0]);
 
   // Only for debugging
   // @@@ Use ifdef
@@ -618,7 +638,7 @@ float batteryVoltage() {
   // Big resistor
   static int bR = 4590;
 
-  return ((analogRead(A0) * Vref) / 1023) * (sR + bR) / sR;
+  return ((analogRead(voltage_pin) * Vref) / 1023) * (sR + bR) / sR;
 }
 
 
@@ -627,7 +647,7 @@ float batteryVoltage() {
  * Return the current in Amps.
  */
 float currentInAmps() {
-  return ((calibration - analogRead(A7)) / 1023 * Vref) * 1000 / 33;
+  return ((calibration - analogRead(current_pin)) / 1023 * Vref) * 1000 / 33;
 }
 
 
@@ -635,41 +655,65 @@ float currentInAmps() {
 /**
  * Scale the battery voltage down to 12 Volts and return a 
  * standardized Array with percentage, voltage and current.
+ * 
+ * // Error messages
+ *    const float no_error = 1;
+ *    const float scaling_error = -1;
+ *    const float V_LB_Error = -2;
+ *    const float V_UB_Error = -3;
+ *    const float perc_LB_Error = -4;
+ *    const float perc_UB_Error = -5;
+ *    
  */
-void measure(float *measurements) {
-    // Return [percentage, voltage, current]
-    // Battery voltage pin: A0
-    // Current: A7
+int measure(float *measurements) {
+
+    int error;
+  
+    // Return [percentage, scaled_voltage, current, measured_voltage]
+    // Battery voltage pin: voltage_pin
+    // Current: current_pin
     float percent;
     
     // Voltage measurement and scaling
     float measuredVoltage = batteryVoltage();
-    int divisor = (int) (measuredVoltage / 9.5);
+    int divisor = (int) (measuredVoltage / scaling_boundary);
     if (divisor < 1) {
       divisor = 1;
     }
+    
     // Scaled voltage:
     float V = measuredVoltage / divisor;
 
     // Current measurement - no scaling
     float I = currentInAmps();
 
+    percent = percentage(V, I, C);
+
     // Can't be right => scaling error
-    // @@@ New field for unscaled voltage
-    if (V < scaling_err_LB || V > scaling_err_UB) {
-      percent = -3;
+    if ((V < scaling_boundary) || (V < scaling_err_LB) || (V > scaling_err_UB)) {
+      error = scaling_error;
+    } else if (V < V_LB_Const) {
+      error = V_LB_Error;      
+    } else if (V > V_UB_Const) {
+      error = V_UB_Error;
+    } else if (percent < perc_LB_Cons) {
+      error = perc_LB_Error;
+    } else if (percent > perc_UB_Cons) {
+      error = perc_UB_Error;
     } else {
-      percent = percentage(V, I, C);
+      error = no_error;
     }
 
-    // @@@ New unfiltered field for all error messages!
-    // @@@ New field for unscaled voltage
     measurements[0] = (199 * measurements[0] + percent) / 200;
-    //measurements[0] = percent;
     measurements[1] = (19 * measurements[1] + V) / 20;
-    //measurements[1] = V;
     measurements[2] = (19 * measurements[2] + I) / 20;
-    //measurements[2] = I;
+    
+    // Give the main function access to the unscaled voltage.
+    // Don't show this to the user because the unscaled error might alarm them unnecessarily.
+    measurements[3] = measuredVoltage;
+
+    return error;
+
 }
 
 
