@@ -230,7 +230,7 @@ void setup()   {
   // Current measurement
   // @@@ Flash the EEEPROM whenever a module is newly created or repurposed.
   // @@@ Set EEEProm and only initialize if it is not yet initialized
-  // @@@ List the EEEProm addresses that are already in use (0, 1, 2) ---> Use #define / const
+  // @@@ List the EEEProm addresses that are already in use (0, 1, 2) ---> Use #define
   pinMode(A7, INPUT);
   if (!((EEPROM.read(0) == 56) && (EEPROM.read(1) == 194) && (EEPROM.read(2) == 42))) {
     // The EEPROM probably isn't configured yet.
@@ -246,7 +246,7 @@ void setup()   {
   // END: Measurement setup
 
   
-  // This is the relay pin. ---> Use # define / const for all the pins...
+  // This is the relay pin. ---> Use # define for all the pins...
   pinMode(6,OUTPUT);
 }
 
@@ -401,7 +401,7 @@ void scroll() {
   if ((ticks - DebounceSnapshot) >= DEB_DELAY) {
       DebounceSnapshot = ticks; // @@@ better at beginning of ISR?
       // @@@ replace all the following 'if' statements with a 'switch'/'case'
-      // @@@ Use # define / const again, -1 ---> main screen...
+      // @@@ Use # define again, -1 ---> main screen...
       if (cur_menu == -1) {
         cur_menu = 0;
         main_menu_item = -1; /// @@@ is this too dirty a hack? And, does it work with checking for 11 below?
@@ -417,7 +417,7 @@ void scroll() {
           main_menu_item = 0;
         }
         // @@@ replace the '11' and menu values
-        // @@@ 11 ---> main_menu.length(), if that is not possible #define / const main_menu_length = main_menu.length()
+        // @@@ 11 ---> main_menu.length(), if that is not possible #define main_menu_length = main_menu.length()
         displayMenu(main_menu,11, main_menu_item);
       }
       
@@ -426,7 +426,7 @@ void scroll() {
         if (mode_menu_item == 4) {
           mode_menu_item = 0;
         }
-        // @@@ 4 ---> mode_menu.length(), if that is not possible #define / const mode_menu_length = mode_menu.length()
+        // @@@ 4 ---> mode_menu.length(), if that is not possible #define mode_menu_length = mode_menu.length()
         displayMenu(mode_menu,4, mode_menu_item);
       }
 
@@ -444,7 +444,7 @@ void scroll() {
   return;
 }
 
-// @@@ Again define / consts could be used for readability...
+// @@@ Again defines could be used for readability...
 void select() {
   Serial.println("Button sel pressed");
   // Potential bug with ticks overflowing!!! @@@

@@ -1,3 +1,9 @@
+// @@@ Check the value
+const float scaling_err_LB = 9.5;
+
+// @@@ Check the value
+const float scaling_err_UB = 14.5;
+
 // Refference voltage
 static float Vref = 5;
 
@@ -140,19 +146,22 @@ void measure(float *measurements) {
     // Current measurement - no scaling
     float I = currentInAmps();
 
-    // Can't be right: scaling error
-    if (V < 8.5 || V > 15.5) {
+    // Can't be right => scaling error
+    // @@@ New field for unscaled voltage
+    if (V < scaling_err_LB || V > scaling_err_UB) {
       percent = -3;
     } else {
       percent = percentage(V, I, C);
     }
 
-    // measurements[0] = (199 * measurements[0] + percent) / 200;
-    measurements[0] = percent;
-    // measurements[1] = (19 * measurements[1] + V) / 20;
-    // measurements[2] = (19 * measurements[2] + I) / 20;
-    measurements[1] = V;
-    measurements[2] = I;
+    // @@@ New unfiltered field for all error messages!
+    // @@@ New field for unscaled voltage
+    measurements[0] = (199 * measurements[0] + percent) / 200;
+    //measurements[0] = percent;
+    measurements[1] = (19 * measurements[1] + V) / 20;
+    //measurements[1] = V;
+    measurements[2] = (19 * measurements[2] + I) / 20;
+    //measurements[2] = I;
 }
 
 
