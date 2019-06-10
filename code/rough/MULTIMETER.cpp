@@ -45,20 +45,29 @@ float MULTIMETER::batteryVoltage() {
 }
 
 
+/**
+ * Triggered whenever the device is powered on and calibrates when
+ * necessary...
+ *
+ * For determining the initial zero value of the current sensor when
+ * the electrician has confirmed that the current is zero. This is
+ * only done once since the electrician needs to be present.
+ */
 void MULTIMETER::calibration() {
   if (!((EEPROM.read(0) == 56) && (EEPROM.read(1) == 194) && (EEPROM.read(2) == 42))) {
 
     // The EEPROM probably isn't configured yet.
-    this->calib = analogRead(current_pin);
-
-    EEPROM.write(0, 56);
-    EEPROM.write(1, 194);
-    EEPROM.write(2, 42);
-    
+    reCalibrate();
   }
 }
 
-
+/**
+ * Called from the UI or from calibration();
+ *
+ * For determining the zero value of the current sensor when the
+ * electrician has confirmed that the current is zero. This is only
+ * done rarely since the electrician needs to be present.
+ */
 void MULTIMETER::reCalibrate() {
     this->calib = analogRead(current_pin);
 
@@ -90,11 +99,17 @@ void MULTIMETER::measure(){
     // Current: current_pin
     float percent;
     
-    // Voltage measurement and scaling
+    // Voltage measurement and scaling.
     float measuredVoltage = batteryVoltage();
     int divisor = (int) (measuredVoltage / scaling_boundary);
+
+    // This should never be needed.
     if (divisor < 1) {
+      // We will probably get a scaling error below.
       divisor = 1;
+    } if (divisor > 4) {
+      // We will probably get a scaling error below.
+      divisor = 4;
     }
     
     // Scaled voltage:
@@ -105,21 +120,32 @@ void MULTIMETER::measure(){
 
     percent = percentage(V, I, capacity);
 
-    // Can't be right => scaling error
+    // @@@ Make sure all states are accounted for!
     if ((V < scaling_boundary) || (V < scaling_err_LB) || (V > scaling_err_UB)) {
+      // This voltage doesn't make sense for any kind of battery, it's
+      // neither a dead 12V/24V/36V/48V battery, nor a flat
+      // 12V/24V/36V/48V battery => scaling error
       error = scaling_error;
+      // @@@ Switch to TNEB and don't do anything.
     } else if (V < V_LB_Const) {
+      // The voltage should never be this low! This boundary stays out of the way.
       error = V_LB_Error;      
     } else if (V > V_UB_Const) {
+      // The voltage should never be this high! This boundary stays out of the way.
       error = V_UB_Error;
     } else if (percent < perc_LB_Cons) {
+      // The percentage should never be this low! This boundary also stays out of the way.
       error = perc_LB_Error;
     } else if (percent > perc_UB_Cons) {
+      // The percentage should never be this high! This boundary stays out of the way.
       error = perc_UB_Error;
     } else {
+      // Everything is fine, let the user defined boundaries decide if the UPS gets charged or not.
       error = no_error;
     }
 
+    // Averaging (digital capacitors / filters)...
+    // @@@ Don't include error values in the average!
     this->measurements[0] = (199 * measurements[0] + percent) / 200;
     this->measurements[1] = (19 * measurements[1] + V) / 20;
     this->measurements[2] = (19 * measurements[2] + I) / 20;
@@ -166,6 +192,10 @@ float MULTIMETER::currentInAmps() {
 /**
  * Return the percentage charge of a battery, given the 
  * voltage, current and capacity of the battery...
+ *
+ * @@@ Use matrices of function coefficients.
+ * @@@ Document it and discuss it with Dyuman.
+ *
  */
 float MULTIMETER::percentage (float U, float I, float C) {
   // I = Q / t, [I] = C / s = .... Ah / 3600 s = ... Ah / 1 h
@@ -201,10 +231,10 @@ float MULTIMETER::percentage (float U, float I, float C) {
         if (0 <= result && result <= 100) {
           return result;          
         } else {
-          return -2;
+          return percent_function_percent_Error;
         }
       } else {
-        return -1;
+        return percent_function_V_Error;
       }
       
     } else if (5 < T && T <= 10) {
@@ -220,12 +250,12 @@ float MULTIMETER::percentage (float U, float I, float C) {
                 + (10 - T) * ((U - 17.481) * (U - 14.408) * (U - 14.202) * (U - 12.168) * (U - 17.452) * (U - 14.783) + 78.465)) / 5;
 
         if (0 <= result && result <= 100) {
-          return result;          
+          return result;
         } else {
-          return -2;
+          return percent_function_percent_Error;
         }
       } else {
-        return -1;
+        return percent_function_V_Error;
       }
 
     } else if (10 < T && T <= 20) {
@@ -242,10 +272,10 @@ float MULTIMETER::percentage (float U, float I, float C) {
         if (0 <= result && result <= 100) {
           return result;          
         } else {
-          return -2;
+          return percent_function_percent_Error;
         }
       } else {
-        return -1;
+        return percent_function_V_Error;
       }
       
     } else if (20 < T && T <= 40) {
@@ -262,10 +292,10 @@ float MULTIMETER::percentage (float U, float I, float C) {
         if (0 <= result && result <= 100) {
           return result;          
         } else {
-          return -2;
+          return percent_function_percent_Error;
         }
       } else {
-        return -1;
+        return percent_function_V_Error;
       }
       
     } else if(40 < T && T <= 200) {
@@ -282,10 +312,10 @@ float MULTIMETER::percentage (float U, float I, float C) {
         if (0 <= result && result <= 100) {
           return result;          
         } else {
-          return -2;
+          return percent_function_percent_Error;
         }
       } else {
-        return -1;
+        return percent_function_V_Error;
       }
     } else {
       // Rest
@@ -298,10 +328,10 @@ float MULTIMETER::percentage (float U, float I, float C) {
           if (0 <= result && result <= 100) {
             return result;          
           } else {
-            return -2;
+            return percent_function_percent_Error;
           }
       } else {
-        return -1;
+        return percent_function_V_Error;
       }
 
     }
@@ -317,10 +347,10 @@ float MULTIMETER::percentage (float U, float I, float C) {
           if (0 <= result && result <= 100) {
             return result;          
           } else {
-            return -2;
+            return percent_function_percent_Error;
           }
       } else {
-        return -1;
+        return percent_function_V_Error;
       }
 
 
@@ -337,10 +367,10 @@ float MULTIMETER::percentage (float U, float I, float C) {
           if (0 <= result && result <= 100) {
             return result;          
           } else {
-            return -2;
+            return percent_function_percent_Error;
           }
       } else {
-        return -1;
+        return percent_function_V_Error;
       }
       
     } else if (20 <= T && T < 100) {
@@ -356,10 +386,10 @@ float MULTIMETER::percentage (float U, float I, float C) {
           if (0 <= result && result <= 100) {
             return result;          
           } else {
-            return -2;
+            return percent_function_percent_Error;
           }
       } else {
-        return -1;
+        return percent_function_V_Error;
       }
       
     } else if (10 <= T && T < 20) {
@@ -375,10 +405,10 @@ float MULTIMETER::percentage (float U, float I, float C) {
           if (0 <= result && result <= 100) {
             return result;          
           } else {
-            return -2;
+            return percent_function_percent_Error;
           }
       } else {
-        return -1;
+        return percent_function_V_Error;
       }
       
     } else if (5 <= T && T < 10) {
@@ -394,10 +424,10 @@ float MULTIMETER::percentage (float U, float I, float C) {
           if (0 <= result && result <= 100) {
             return result;          
           } else {
-            return -2;
+            return percent_function_percent_Error;
           }
       } else {
-        return -1;
+        return percent_function_V_Error;
       }
       
     } else if (3 <= T && T < 5) {
@@ -413,10 +443,10 @@ float MULTIMETER::percentage (float U, float I, float C) {
           if (0 <= result && result <= 100) {
             return result;          
           } else {
-            return -2;
+            return percent_function_percent_Error;
           }
       } else {
-        return -1;
+        return percent_function_V_Error;
       }
       
     } else if (T < 3) {
@@ -431,10 +461,10 @@ float MULTIMETER::percentage (float U, float I, float C) {
           if (0 <= result && result <= 100) {
             return result;          
           } else {
-            return -2;
+            return percent_function_percent_Error;
           }
       } else {
-        return -1;
+        return percent_function_V_Error;
       }
     }
 
