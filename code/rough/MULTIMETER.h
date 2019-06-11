@@ -6,7 +6,7 @@
 class MULTIMETER {
 
 // Global variables
-float measurements[4];
+float measurements[4]; // @@@ maybe variables should be initialized to 0?
 float capacity;
 float calib;
 int error;

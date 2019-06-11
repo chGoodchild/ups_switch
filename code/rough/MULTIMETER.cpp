@@ -2,6 +2,9 @@
 #include "PINDEFINITIONS.h"
 #include "CODEDEFINITIONS.h"
 #include <EEPROM.h>
+#include <Adafruit_ADS1015.h>
+
+Adafruit_ADS1115 ads;
 
 // Global variables
 float measurements[4];
@@ -16,12 +19,14 @@ MULTIMETER::MULTIMETER(float C){
   // single setup function in order to ensure that we don't 
   // use the same pin for two different things...
   // Voltage measurement
-  pinMode(voltage_pin, INPUT);
+  //pinMode(voltage_pin, INPUT);
 
   // Current measurement
   // @@@ Set EEEProm and only initialize if it is not yet initialized
   // @@@ List the EEEProm addresses that are already in use (0, 1, 2) ---> Use #define / const
-  pinMode(current_pin, INPUT);
+  //pinMode(current_pin, INPUT);
+
+  // @@@ tmp stuffed ads begin in reCalibrate function, needs to be fixed!!
 
   this->capacity = capacity;
   calibration();
@@ -37,11 +42,12 @@ MULTIMETER::~MULTIMETER(){/*nothing to destruct*/}
  */
 float MULTIMETER::batteryVoltage() {
   // Small resistor
-  static int sR = 317;
+  static int sR = 1200;
   // Big resistor
-  static int bR = 4590;
+  static int bR = 10000;
 
-  return ((analogRead(voltage_pin) * Vref) / 1023) * (sR + bR) / sR;
+  //return ((analogRead(voltage_pin) * Vref) / 1023) * (sR + bR) / sR;
+  return(ads.readADC_SingleEnded(voltage_pin) * adcRatio / 1000 * ((sR + bR) / sR)); // @@@ or should we keep it in millivolts for more precision and divide it after converting it to battery voltage range? / is it being treated as int or float?
 }
 
 
@@ -69,11 +75,30 @@ void MULTIMETER::calibration() {
  * done rarely since the electrician needs to be present.
  */
 void MULTIMETER::reCalibrate() {
-    this->calib = analogRead(current_pin);
+  // @@@ tmp abusing this function 
+  ads.begin();
+  ads.setGain(GAIN_ONE); // @@@ which gain to use / are we using? @@@ do we need to wait before running setGain and/or is it right to run it after ads.begin?
+  capacity = 240; // @@@ tmp
 
-    EEPROM.write(0, 56);
-    EEPROM.write(1, 194);
-    EEPROM.write(2, 42);
+  delay(2000);
+  ads.readADC_SingleEnded(cur_ref_pin);
+  ads.readADC_SingleEnded(cur_sen_pin);
+  ads.readADC_SingleEnded(cur_ref_pin);
+  ads.readADC_SingleEnded(cur_sen_pin);
+  delay(2000);
+  
+  // @@@ re-use code. code here for calib is same as in measure current function
+  float v_cur_ref = 0;
+  float v_cur_sen = 0;
+   
+  v_cur_ref = ((ads.readADC_SingleEnded(cur_ref_pin) * adcRatio)); // @@@ or should we keep it in millivolts for more precision and divide it after converting it to battery voltage range? / is it being treated as int or float?
+  v_cur_sen = ((ads.readADC_SingleEnded(cur_sen_pin) * adcRatio)); // @@@ or should we keep it in millivolts for more precision and divide it after converting it to battery voltage range? / is it being treated as int or float?
+ 
+  this->calib = (v_cur_sen - (v_cur_ref / 2));
+
+  EEPROM.write(0, 56);
+  EEPROM.write(1, 194);
+  EEPROM.write(2, 42);
 
 }
   
@@ -107,7 +132,7 @@ void MULTIMETER::measure(){
     if (divisor < 1) {
       // We will probably get a scaling error below.
       divisor = 1;
-    } if (divisor > 4) {
+    } if (divisor > 4) { // @@@ should this be else if?
       // We will probably get a scaling error below.
       divisor = 4;
     }
@@ -146,9 +171,9 @@ void MULTIMETER::measure(){
 
     // Averaging (digital capacitors / filters)...
     // @@@ Don't include error values in the average!
-    this->measurements[0] = (199 * measurements[0] + percent) / 200;
-    this->measurements[1] = (19 * measurements[1] + V) / 20;
-    this->measurements[2] = (19 * measurements[2] + I) / 20;
+    this->measurements[0] = (0 * measurements[0] + percent) / 1; // @@@ tmp changed average weights
+    this->measurements[1] = (0 * measurements[1] + V) / 1;
+    this->measurements[2] = (0 * measurements[2] + I) / 1; // @@@ we have ovfs when averaging
     
     // Give the main function access to the unscaled voltage.
     // Don't show this to the user because the unscaled error might alarm them unnecessarily.
@@ -185,7 +210,18 @@ float MULTIMETER::getError() {
  * Return the current in Amps.
  */
 float MULTIMETER::currentInAmps() {
-  return ((calib - analogRead(current_pin)) / 1023 * Vref) * 1000 / 33;
+  float v_cur_ref = 0;
+  float v_cur_sen = 0;
+  float v_cur_dif = 0;
+  
+  v_cur_ref = ((ads.readADC_SingleEnded(cur_ref_pin) * adcRatio)); // @@@ or should we keep it in millivolts for more precision and divide it after converting it to battery voltage range? / is it being treated as int or float?
+  v_cur_sen = ((ads.readADC_SingleEnded(cur_sen_pin) * adcRatio)); // @@@ or should we keep it in millivolts for more precision and divide it after converting it to battery voltage range? / is it being treated as int or float?
+
+  v_cur_dif = (v_cur_sen - (v_cur_ref / 2) - calib);
+ 
+  return (v_cur_dif / cur_sen_mv_ratio); // @@@ or should we keep it in millivolts for more precision and divide it after converting it to battery voltage range? / is it being treated as int or float?
+
+  //return ((calib - analogRead(current_pin)) / 1023 * Vref) * 1000 / 33;
 }
 
 
@@ -216,7 +252,7 @@ float MULTIMETER::percentage (float U, float I, float C) {
     }
 
   
-  if (I > 0) {
+  if (I > 0) { // @@@ what about when we are at or very close to 0 and value keeps fluctuating between -0.0xx and +0.0xx amps?
     // CHARGING
 
     if (T <= 5) {

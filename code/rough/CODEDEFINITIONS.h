@@ -7,7 +7,9 @@
 // @@@ Do this in the EEProm? Allow the user to modify / influence this?
 // MCP1702 in grace
 // @@@ Dyuman knows what needs to be done...
-const float Vref = 4.99;
+const float adcRatio = 0.1252;
+const float cur_sen_mv_ratio = 28;
+
 
 // @@@ Check the value
 const float scaling_err_LB = 9.5;
@@ -43,7 +45,8 @@ const float percent_function_V_Error = -6;
 const float percent_function_percent_Error = -7;
 
 // @@@ Check the following constants.
-// Error / Boundary constantsconst float scaling_boundary = 9.5;
+// Error / Boundary constants
+const float scaling_boundary = 9.5;
 const float V_LB_Const = 8.5;
 const float V_UB_Const = 15.5;
 const float perc_LB_Cons = 15;

@@ -102,7 +102,7 @@ volatile char mode_menu[][10] ={"Automatic\0","Off\0","On\0","Back\0"};
 const byte interruptPinScr = 8;
 const byte interruptPinSel = 9;
 
-MULTIMETER *mult = new MULTIMETER(26);
+MULTIMETER *mult = new MULTIMETER(120);
 
 #define LOGO16_GLCD_HEIGHT 16 
 #define LOGO16_GLCD_WIDTH  16 
@@ -214,6 +214,9 @@ void setup()   {
   
   // This is the relay pin. ---> Use # define / const for all the pins...
   pinMode(6,OUTPUT);
+
+  mult->reCalibrate(); // @@@ tmp because mult constructor runs before
+
 }
 
 
@@ -223,20 +226,20 @@ void loop() {
 
   // BEGIN: Measure
 
-  
+
   mult->measure();
 
   // Only for debugging
   // @@@ Use ifdef
-  Serial.print("Percentage: ");
+  Serial.print(",");
   Serial.print(mult->getPercentage());
-  Serial.print("\t");
-  Serial.print("Voltage: ");
+  Serial.print(" ,");
+  Serial.print("");
   Serial.print(mult->getV());
-  Serial.print("\t");
-  Serial.print("Current: ");
+  Serial.print("  ,");
+  Serial.print("");
   Serial.print(mult->getI());
-  Serial.println("\t");
+  Serial.println("");
 
   // END: Measure
 
@@ -575,6 +578,3 @@ void fltPrmpt(char title[9], float curValue) {
   display.println(curValue);
   display.display();
 }
-
-
-
