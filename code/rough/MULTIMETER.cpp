@@ -171,9 +171,9 @@ void MULTIMETER::measure(){
 
     // Averaging (digital capacitors / filters)...
     // @@@ Don't include error values in the average!
-    this->measurements[0] = (0 * measurements[0] + percent) / 1; // @@@ tmp changed average weights
-    this->measurements[1] = (0 * measurements[1] + V) / 1;
-    this->measurements[2] = (0 * measurements[2] + I) / 1; // @@@ we have ovfs when averaging
+    this->measurements[0] = (9 * measurements[0] + percent) / 10; // @@@ tmp changed average weights
+    this->measurements[1] = (1 * measurements[1] + V) / 2;
+    this->measurements[2] = (9 * measurements[2] + I) / 10; // @@@ we have ovfs when averaging
     
     // Give the main function access to the unscaled voltage.
     // Don't show this to the user because the unscaled error might alarm them unnecessarily.
