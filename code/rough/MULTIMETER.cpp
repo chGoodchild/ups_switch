@@ -86,6 +86,11 @@ void MULTIMETER::reCalibrate() {
   ads.readADC_SingleEnded(cur_ref_pin);
   ads.readADC_SingleEnded(cur_sen_pin);
   delay(2000);
+
+    // @@@ tmp
+    this->measurements[0] = 0;
+    this->measurements[1] = 0;
+    this->measurements[2] = 0; // @@@ we have ovfs when averaging
   
   // @@@ re-use code. code here for calib is same as in measure current function
   float v_cur_ref = 0;
@@ -171,9 +176,9 @@ void MULTIMETER::measure(){
 
     // Averaging (digital capacitors / filters)...
     // @@@ Don't include error values in the average!
-    this->measurements[0] = (9 * measurements[0] + percent) / 10; // @@@ tmp changed average weights
-    this->measurements[1] = (1 * measurements[1] + V) / 2;
-    this->measurements[2] = (9 * measurements[2] + I) / 10; // @@@ we have ovfs when averaging
+    this->measurements[0] = ((14 * (measurements[0] / 15)) + (percent / 15)); // @@@ tmp changed average weights
+    this->measurements[1] = ((2 * (measurements[1] / 3)) + (V / 3));
+    this->measurements[2] = ((14 * (measurements[2] / 15)) + (I / 15)); // @@@ we have ovfs when averaging
     
     // Give the main function access to the unscaled voltage.
     // Don't show this to the user because the unscaled error might alarm them unnecessarily.
