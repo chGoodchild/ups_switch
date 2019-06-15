@@ -11,8 +11,8 @@ Adafruit_SSD1306 display(OLED_RESET);
   
 // Runtime config mode
 uint8_t cur_menu = 0;
-float submenu_fl_cur_setting[MAIN_MENU_ITEMS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // @@@ or -1 init?
-uint8_t submenu_int_cur_setting[MAIN_MENU_ITEMS] = { 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1}; // @@@ or -1 init? @@@ menu definition in separate file, make this universal!!!
+float submenu_fl_cur_setting[MAIN_MENU_ITEMS] = { 0, 0, 0, 0, 0 }; // @@@ or -1 init?
+uint8_t submenu_int_cur_setting[MAIN_MENU_ITEMS] = { 0, 0, 0, 0, 1 }; // @@@ or -1 init? @@@ menu definition in separate file, make this universal!!! @@@ change order of btns in other sketch
 float pres_sett_orig_val_fl = 0;
 uint8_t pres_sett_orig_val_int = 0;
 
@@ -150,7 +150,7 @@ void init_display() {
   
 }
 // @@@ rename suffixes to dsp_menu?
-void menu_setup(int dwn_btn, int up_btn, int sel_btn) {
+void menu_setup(int sel_btn, int up_btn, int dwn_btn) {
   pinMode(dwn_btn, INPUT);    // sets the digital pin 7 as input
   digitalWrite(dwn_btn, 1);
   pinMode(up_btn, INPUT);    // sets the digital pin 7 as input
@@ -202,7 +202,7 @@ void menu_setup(int dwn_btn, int up_btn, int sel_btn) {
   }
 }
 
-bool menu_loop(int dwn_btn, int up_btn, int sel_btn) {
+bool menu_loop(int sel_btn, int up_btn, int dwn_btn) {
   bool config_mode = (!digitalRead(sel_btn)); // @@@ make define of all pins
   if (config_mode) {
     delay(800);

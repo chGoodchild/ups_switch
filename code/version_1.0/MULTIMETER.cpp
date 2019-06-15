@@ -7,10 +7,10 @@
 Adafruit_ADS1115 ads;
 
 // Global variables
-float measurements[4];
-float capacity;
-float calib;
-int error;
+float measurements[4] = { 0, 0, 0, 0 };
+float capacity = 0;
+float calib = 0;
+int error = 0;
 
 // Constructor
 MULTIMETER::MULTIMETER(float C){
