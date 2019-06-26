@@ -26,7 +26,7 @@ const uint8_t submenu_eeprom_addr[MAIN_MENU_ITEMS] PROGMEM = { 52, 4, 8, 12, 16 
 const bool submenu_float[MAIN_MENU_ITEMS] = { 1, 1, 1, 1, 0 };
 
 // Display strings @@@ better names and comment
-const char ad[3] PROGMEM = "..";
+const char ad[4] PROGMEM = "...";
 const char eeprom_err_msg_1[16] PROGMEM = "EEPROM not init";
 const char reset_defaults_1[45] PROGMEM = "Restore default\nsettings, press X to confirm"; // @@@ make sure \n and \0 count as single character and are understood
 const char reset_defaults_2[39] PROGMEM = "Default settings\nrestored, press Reset";

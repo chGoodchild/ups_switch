@@ -13,7 +13,7 @@ float calib = 0;
 int error = 0;
 
 // Constructor
-MULTIMETER::MULTIMETER(float C){
+MULTIMETER::MULTIMETER(){ // @@@ removed variable
 
   // @@@ We have to shift all the pin initializations into a 
   // single setup function in order to ensure that we don't 
@@ -28,8 +28,8 @@ MULTIMETER::MULTIMETER(float C){
 
   // @@@ tmp stuffed ads begin in reCalibrate function, needs to be fixed!!
 
-  this->capacity = capacity;
-  calibration();
+  this->capacity = capacity; // @@@ is this needed?
+  //calibration(); // @@@ should we do this? in any case this is not the right place
 }
 
 
@@ -44,27 +44,10 @@ float MULTIMETER::batteryVoltage() {
   // Small resistor
   static int sR = 1200;
   // Big resistor
-  static int bR = 10000;
+  static int bR = 10000; // @@@ these should be moved to one of the .h files
 
   //return ((analogRead(voltage_pin) * Vref) / 1023) * (sR + bR) / sR;
   return(ads.readADC_SingleEnded(voltage_pin) * adcRatio / 1000 * ((sR + bR) / sR)); // @@@ or should we keep it in millivolts for more precision and divide it after converting it to battery voltage range? / is it being treated as int or float?
-}
-
-
-/**
- * Triggered whenever the device is powered on and calibrates when
- * necessary...
- *
- * For determining the initial zero value of the current sensor when
- * the electrician has confirmed that the current is zero. This is
- * only done once since the electrician needs to be present.
- */
-void MULTIMETER::calibration() {
-  if (!((EEPROM.read(0) == 56) && (EEPROM.read(1) == 194) && (EEPROM.read(2) == 42))) {
-
-    // The EEPROM probably isn't configured yet.
-    reCalibrate();
-  }
 }
 
 /**
@@ -75,23 +58,6 @@ void MULTIMETER::calibration() {
  * done rarely since the electrician needs to be present.
  */
 void MULTIMETER::reCalibrate() {
-  // @@@ tmp abusing this function 
-  ads.begin();
-  ads.setGain(GAIN_ONE); // @@@ which gain to use / are we using? @@@ do we need to wait before running setGain and/or is it right to run it after ads.begin?
-  capacity = 240; // @@@ tmp
-
-  delay(2000);
-  ads.readADC_SingleEnded(cur_ref_pin);
-  ads.readADC_SingleEnded(cur_sen_pin);
-  ads.readADC_SingleEnded(cur_ref_pin);
-  ads.readADC_SingleEnded(cur_sen_pin);
-  delay(2000);
-
-    // @@@ tmp
-    this->measurements[0] = 0;
-    this->measurements[1] = 0;
-    this->measurements[2] = 0; // @@@ we have ovfs when averaging
-  
   // @@@ re-use code. code here for calib is same as in measure current function
   float v_cur_ref = 0;
   float v_cur_sen = 0;
@@ -104,9 +70,44 @@ void MULTIMETER::reCalibrate() {
   EEPROM.write(0, 56);
   EEPROM.write(1, 194);
   EEPROM.write(2, 42);
+  EEPROM.put(44, this->calib);
+}
+
+/**
+ * Called at startup
+ *
+ * Initializes the ADC module and does other tasks necessary to be able to start measuring.
+ */
+void MULTIMETER::initialize(float C) {
+  ads.begin();
+  ads.setGain(GAIN_ONE); // @@@ which gain to use / are we using? @@@ do we need to wait before running setGain and/or is it right to run it after ads.begin?
+  capacity = C;
+
+  delay(200);
+  ads.readADC_SingleEnded(cur_ref_pin);
+  ads.readADC_SingleEnded(cur_sen_pin);
+  ads.readADC_SingleEnded(cur_ref_pin);
+  ads.readADC_SingleEnded(cur_sen_pin);
+  delay(200); // @@@ figure out exact delay, etc.
+
+  // @@@ tmp
+  this->measurements[0] = 0;
+  this->measurements[1] = 0;
+  this->measurements[2] = 0; // @@@ we have ovfs when averaging
+
+  if (!((EEPROM.read(0) == 56) && (EEPROM.read(1) == 194) && (EEPROM.read(2) == 42))) {
+    // The EEPROM probably isn't configured yet.
+    this->error = calibration_not_done_Error; // @@@ ok to use same this->error and error value range?
+    this->calib = 0;
+  } else {
+    EEPROM.get(44, this->calib);
+    for(int i = 0; i < 60; i++) { // @@@ possibly review how this issue is fixed.
+      measure(); // @@@ position of this with respect to below error assignment
+    }
+    this->error = no_error; // @@@ should we do this?
+  }
 
 }
-  
  
 /**
  * Scale the battery voltage down to 12 Volts and return a 

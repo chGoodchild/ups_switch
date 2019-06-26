@@ -19,6 +19,7 @@ void setup() {
     }
 
     EEPROM.write(TEST_EEPROM_ADDR, TEST_EEPROM_VALUE);
+    EEPROM.write(0, 1);
 }
 
 void loop() {

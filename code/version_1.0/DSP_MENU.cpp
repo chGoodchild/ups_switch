@@ -19,12 +19,12 @@ uint8_t pres_sett_orig_val_int = 0;
 void set_display_menu() { // @@@ declare non-public functions in .h file?
   
   display.clearDisplay();
-  menu_write_display(0,0,2,false,0,mainmenu[cur_menu]);
+  menu_write_display(0,0,2,false,0,0,mainmenu[cur_menu]);
   //Serial.println(mainmenu[0]);
   if(submenu_float[cur_menu]) {  
-    menu_write_display(0,18,2,true,submenu_fl_cur_setting[cur_menu],suffixmenu[cur_menu]);
+    menu_write_display(0,18,2,true,2,submenu_fl_cur_setting[cur_menu],suffixmenu[cur_menu]);
   } else {
-    menu_write_display(0,18,2,false,0,submenu[cur_menu][submenu_int_cur_setting[cur_menu]]);
+    menu_write_display(0,18,2,false,0,0,submenu[cur_menu][submenu_int_cur_setting[cur_menu]]);
   }
   display.display();
 }
@@ -90,7 +90,7 @@ void set_next_menu() {
     set_display_menu();
   } else {
     display.clearDisplay();
-    menu_write_display(0,18,2,false,0,ad);
+    menu_write_display(0,18,2,false,0,0,ad);
     display.display();
     cur_menu = 0;
   }
@@ -106,11 +106,11 @@ void menu_display_clearDisplay() { // @@@ use these two functions also from with
   display.clearDisplay();
 }
 
-void menu_write_display(int x, int y, int s, bool display_number, float number, const char text[]) { // @@@ are the passed text[]s null terminated? @@@ String type good? @@@ need to set type String also elsewhere? e.g. arrays containing menu info
+void menu_write_display(int x, int y, int s, bool display_number, int dec, float number, const char text[]) { // @@@ are the passed text[]s null terminated? @@@ String type good? @@@ need to set type String also elsewhere? e.g. arrays containing menu info
   display.setCursor(x,y);
   display.setTextSize(s);
   if(display_number) {
-    display.print(number,2);
+    display.print(number,dec);
   }
 
   char myChar;
@@ -165,14 +165,14 @@ void menu_setup(int sel_btn, int up_btn, int dwn_btn) {
   if (EEPROM.read(TEST_EEPROM_ADDR) != TEST_EEPROM_VALUE) {
     delay(200);
     display.clearDisplay();
-    menu_write_display(0,0,2,false,0,eeprom_err_msg_1); // @@@ add indication of shed status
+    menu_write_display(0,0,2,false,0,0,eeprom_err_msg_1); // @@@ add indication of shed status
     display.display();
     while(1);
   }
   if (reset_mode) { 
     delay(200);
     display.clearDisplay();
-    menu_write_display(0,0,1,false,0,reset_defaults_1);
+    menu_write_display(0,0,1,false,0,0,reset_defaults_1);
     display.display();
     while(!digitalRead(sel_btn));
     delay(800); // @@@ review and make defines for all delay times or other values, etc.
@@ -196,7 +196,7 @@ void menu_setup(int sel_btn, int up_btn, int dwn_btn) {
 
     // display confirmation
     display.clearDisplay();
-    menu_write_display(0,0,1,false,0,reset_defaults_2); // @@@ put char sizes in #defines also?
+    menu_write_display(0,0,1,false,0,0,reset_defaults_2); // @@@ put char sizes in #defines also?
     display.display();
     while (1);
   }
