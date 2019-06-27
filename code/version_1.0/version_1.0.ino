@@ -17,12 +17,7 @@
 #define CMD_NEUTRAL 0
 const char symbols[8][2] PROGMEM = { "%", "V", "A", "C", "", "", "T", "M" }; // @@@ just not show anything instead of chrg. off
 const char messages[5][31] PROGMEM = { "Scaling error", "Battery voltage\ncritically low", "Battery voltage very\nhigh", "perc_LB_error", "perc_UB_error" };
-const char recalib_1[77] PROGMEM = "Recalibrate current\nsensor, ensure\ncurrent is zero and\npress X to confirm..."; // @@@ make sure \n and \0 count as single character and are understood
-const char recalib_2[41] PROGMEM = "Current sensor\nrecalibrated, press\nReset";
-const char topup_1[40] PROGMEM = "Start battery topup?\nPress X to confirm"; // @@@ make sure \n and \0 count as single character and are understood
-const char topup_2[22] PROGMEM = "Battery topup started";
-const char topup_3[41] PROGMEM = "Cancel battery topup?\nPress X to confirm"; // @@@ make sure \n and \0 count as single character and are understood
-const char topup_4[24] PROGMEM = "Battery topup\ncancelled"; // @@@ re-count number of chars in each var and update constructor
+
 
 // Variables for storing in memory during runtime menu setting values read from EEPROM
 float battery_ah = 0;
@@ -112,7 +107,7 @@ void setup() {
     // ask confirmation
     delay(200);
     menu_display_clearDisplay();
-    menu_write_display(0,0,1,false,0,0,recalib_1);
+    menu_write_display(0,0,1,false,0,0,prmpt_message[2]);
     menu_display_display();
     while(!digitalRead(BTN_2_PIN));
     delay(800); // @@@ review and make defines for all delay times or other values, etc.
@@ -126,7 +121,7 @@ void setup() {
     
     // display confirmation
     menu_display_clearDisplay();
-    menu_write_display(0,0,1,false,0,0,recalib_2); // @@@ put char sizes in #defines also?
+    menu_write_display(0,0,1,false,0,0,prmpt_message[3]); // @@@ put char sizes in #defines also?
     menu_display_display();
     while (1);
   }
@@ -172,7 +167,7 @@ void loop() {
         int delay_counter = 0;
         delay(800);
         menu_display_clearDisplay();
-        menu_write_display(0,0,1,false,0,0,topup_3);
+        menu_write_display(0,0,1,false,0,0,prmpt_message[6]);
         menu_display_display();
         while(!digitalRead(BTN_2_PIN));
         delay(800); // @@@ review and make defines for all delay times or other values, etc.
@@ -185,7 +180,7 @@ void loop() {
           topup_wants_charge = CMD_STOP_CHARGE;
           // display confirmation
           menu_display_clearDisplay();
-          menu_write_display(0,0,1,false,0,0,topup_4); // @@@ put char sizes in #defines also?
+          menu_write_display(0,0,1,false,0,0,prmpt_message[7]); // @@@ put char sizes in #defines also?
           menu_display_display();
           delay(800); // @@@ review all delay values
         }
@@ -193,7 +188,7 @@ void loop() {
         int delay_counter = 0; // @@@ make into separate function in menu class
         delay(800);
         menu_display_clearDisplay();
-        menu_write_display(0,0,1,false,0,0,topup_1);
+        menu_write_display(0,0,1,false,0,0,prmpt_message[4]);
         menu_display_display();
         while(!digitalRead(BTN_2_PIN));
         delay(800); // @@@ review and make defines for all delay times or other values, etc.
@@ -206,7 +201,7 @@ void loop() {
           topup_wants_charge = CMD_RUN_CHARGE;
           // display confirmation
           menu_display_clearDisplay();
-          menu_write_display(0,0,1,false,0,0,topup_2); // @@@ put char sizes in #defines also?
+          menu_write_display(0,0,1,false,0,0,prmpt_message[5]); // @@@ put char sizes in #defines also?
           menu_display_display();
           delay(800); // @@@ review all delay values
         }

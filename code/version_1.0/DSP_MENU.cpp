@@ -16,6 +16,34 @@ uint8_t submenu_int_cur_setting[MAIN_MENU_ITEMS] = { 0, 0, 0, 0, 1 }; // @@@ or 
 float pres_sett_orig_val_fl = 0;
 uint8_t pres_sett_orig_val_int = 0;
 
+bool menu_show_prompt(int init_delay, int message1, int message2, int timeout, int btn_pin) {
+  int delay_counter = -1;
+  delay_counter = timeout - 1;
+  delay(init_delay);
+  menu_display_clearDisplay();
+  menu_write_display(0,0,1,false,0,0,prmpt_message[message1]);
+  menu_display_display();
+  while(!digitalRead(btn_pin));
+  delay(800); // @@@ review and make defines for all delay times or other values, etc.
+  while(!digitalRead(btn_pin)); // @@@ do this?
+  while(digitalRead(btn_pin) && (delay_counter < timeout)) { // @@@ make #define for delay, also below
+    delay(1);
+    if (timeout > 0) {
+      delay_counter++;
+    }
+  }
+  if (delay_counter < timeout) { // @@@ is this too dirty? @@@ see above
+    // display confirmation
+    menu_display_clearDisplay();
+    menu_write_display(0,0,1,false,0,0,prmpt_message[message2]); // @@@ put char sizes in #defines also?
+    menu_display_display();
+    delay(800); // @@@ review all delay values
+    return true;
+  } else {
+    return false;
+  }
+}
+  
 void set_display_menu() { // @@@ declare non-public functions in .h file?
   
   display.clearDisplay();
@@ -90,7 +118,7 @@ void set_next_menu() {
     set_display_menu();
   } else {
     display.clearDisplay();
-    menu_write_display(0,18,2,false,0,0,ad);
+    menu_write_display(ad_x,ad_y,ad_s,false,0,0,ad);
     display.display();
     cur_menu = 0;
   }
@@ -149,7 +177,7 @@ void init_display() {
   //display.clearDisplay();
   
 }
-// @@@ rename suffixes to dsp_menu?
+// @@@ rename suffixes to dsp_menu? @@@ int good type for btn?
 void menu_setup(int sel_btn, int up_btn, int dwn_btn) {
   pinMode(dwn_btn, INPUT);    // sets the digital pin 7 as input
   digitalWrite(dwn_btn, 1);
@@ -170,34 +198,23 @@ void menu_setup(int sel_btn, int up_btn, int dwn_btn) {
     while(1);
   }
   if (reset_mode) { 
-    delay(200);
-    display.clearDisplay();
-    menu_write_display(0,0,1,false,0,0,reset_defaults_1);
-    display.display();
-    while(!digitalRead(sel_btn));
-    delay(800); // @@@ review and make defines for all delay times or other values, etc.
-    while(!digitalRead(sel_btn)); // @@@ do this?
-    while(digitalRead(sel_btn));
-    // do the reset
-    uint8_t iterator = 0; // @@@ consistency in declaring iterators
-    for(iterator = 0; iterator < MAIN_MENU_ITEMS; iterator++) { // @@@ 13
-      if(submenu_float[iterator]) {
-        float pres_val = 0;
-        EEPROM.get(pgm_read_byte(&submenu_eeprom_addr[iterator]), pres_val); // @@@ also here, do we need to declare float variable with f?
-        if(pres_val != pgm_read_float(&submenu_fl_defaults[iterator])) { // @@@ test this (and below int), that doesn't write when already equal, but that writes reliably when necessary
-          EEPROM.put(pgm_read_byte(&submenu_eeprom_addr[iterator]), pgm_read_float(&submenu_fl_defaults[iterator])); // @@@ do we need to declare float variable with f?
-        }
-      } else {
-        if(EEPROM.read(pgm_read_byte(&submenu_eeprom_addr[iterator])) != pgm_read_byte(&submenu_int_defaults[iterator])) {
-          EEPROM.write(pgm_read_byte(&submenu_eeprom_addr[iterator]), pgm_read_byte(&submenu_int_defaults[iterator])); // @@@ first check if value changed
+    if(menu_show_prompt(200, 0, 1, 0, sel_btn)) {
+      // do the reset
+      uint8_t iterator = 0; // @@@ consistency in declaring iterators
+      for(iterator = 0; iterator < MAIN_MENU_ITEMS; iterator++) { // @@@ 13
+        if(submenu_float[iterator]) {
+          float pres_val = 0;
+          EEPROM.get(pgm_read_byte(&submenu_eeprom_addr[iterator]), pres_val); // @@@ also here, do we need to declare float variable with f?
+          if(pres_val != pgm_read_float(&submenu_fl_defaults[iterator])) { // @@@ test this (and below int), that doesn't write when already equal, but that writes reliably when necessary
+            EEPROM.put(pgm_read_byte(&submenu_eeprom_addr[iterator]), pgm_read_float(&submenu_fl_defaults[iterator])); // @@@ do we need to declare float variable with f?
+          }
+        } else {
+          if(EEPROM.read(pgm_read_byte(&submenu_eeprom_addr[iterator])) != pgm_read_byte(&submenu_int_defaults[iterator])) {
+            EEPROM.write(pgm_read_byte(&submenu_eeprom_addr[iterator]), pgm_read_byte(&submenu_int_defaults[iterator])); // @@@ first check if value changed
+          }
         }
       }
     }
-
-    // display confirmation
-    display.clearDisplay();
-    menu_write_display(0,0,1,false,0,0,reset_defaults_2); // @@@ put char sizes in #defines also?
-    display.display();
     while (1);
   }
 }
@@ -217,6 +234,7 @@ bool menu_loop(int sel_btn, int up_btn, int dwn_btn) {
     }
     set_display_menu();
     while(!digitalRead(sel_btn));
+    delay(500);
     while (config_mode) {
       if(!digitalRead(dwn_btn)) {
         set_change_value(false);
@@ -230,7 +248,7 @@ bool menu_loop(int sel_btn, int up_btn, int dwn_btn) {
         if (cur_menu < 1) {
           config_mode = false;
         }
-        //delay(300); // @@@ unite? at least #define common delay @@@ verify that all is ok with changing settings while running @@@ and why is this delay commented out?
+        delay(300); // @@@ unite? at least #define common delay @@@ verify that all is ok with changing settings while running @@@ and why is this delay commented out?
       }
     }
     return true;
