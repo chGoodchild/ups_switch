@@ -152,31 +152,6 @@ plt.scatter(c5, percent, label="C5")
 plot(x=c5, y=percent, order=3, lbl="C5 third order")
 
 plt.scatter(c10, percent, label="C10")
-#plot(x=c10, y=percent, order=2, lbl="C10")
-"""
-plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 12", offs=(11, 100), steepness=0.14)
-plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 13", offs=(11.5, 100), steepness=0.14)
-plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 14", offs=(12, 100), steepness=0.14)
-plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 12.5", offs=(12.5, 100), steepness=0.14)
-plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 13", offs=(13, 100), steepness=0.14)
-plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 13.5", offs=(13.5, 100), steepness=0.14)
-plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 14", offs=(14, 100), steepness=0.14)
-"""
-
-"""
-plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 14.5", offs=(14.5, 100), steepness=0.14)
-plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 15.5", offs=(15.5, 100), steepness=0.14)
-plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 16", offs=(16, 100), steepness=0.14)
-"""
-
-"""
-plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 15", offs=(15, 100), steepness=0.11)
-plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 15", offs=(15, 100), steepness=0.12)
-plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 15", offs=(15, 100), steepness=0.13)
-plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 15", offs=(15, 100), steepness=0.14)
-"""
-
-# plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 15", offs=(15, 100), steepness=0.13)
 plot_poly_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 15", offs=(15, 100), steepness=0.13)
 
 
