@@ -118,6 +118,8 @@ def plot_sigmoid(x, y, order, lbl, offs, steepness):
             ynew[i] = -10
         if ynew[i] > 130:
             ynew[i] = 130
+        if xnew[i] < 12:
+            ynew[i] = -10
 
     plt.plot(xnew, ynew, label=lbl)
 
@@ -140,6 +142,8 @@ def plot_poly_sigmoid(x, y, order, lbl, offs, steepness):
             ynew[i] = -10
         if ynew[i] > 130:
             ynew[i] = 130
+        if xnew[i] < 12:
+            ynew[i] = -10
 
     plt.plot(xnew, ynew, label=lbl)
 
@@ -149,18 +153,26 @@ percent11 = [110, 100, 90, 80, 70, 60, 50, 40, 30, 20, 10]
 percentRest = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
 plt.scatter(c5, percent, label="C5")
-plot(x=c5, y=percent, order=3, lbl="C5")
+plot(x=c5, y=percent, order=3, lbl="C5 3rd order")
 
 plt.scatter(c10, percent, label="C10")
-plot_poly_sigmoid(x=c10, y=percent, order=2, lbl="C10", offs=(15, 100), steepness=0.13)
+# plot(x=c10, y=percent, order=3, lbl="C10 3rd order") # Not as good
+plot_poly_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid", offs=(15, 100), steepness=0.13)
 
 plt.scatter(c20, percent, label="C20")
-plot_sigmoid(x=c20, y=percent, order=2, lbl="C20", offs=(15, 100), steepness=0.11)
-
-
-#plot(x=c20, y=percent, order=2, lbl="C20")
+#plot(x=c20, y=percent, order=2, lbl="C20 2nd order") # Not as good
+plot_sigmoid(x=c20, y=percent, order=2, lbl="C20 sigmoid", offs=(15, 100), steepness=0.11)
+# plot_poly_sigmoid(x=c20, y=percent, order=4, lbl="C20 poly sigmoid", offs=(15, 100), steepness=0.11) # Not as good
 
 plt.scatter(c40, percent, label="C40")
+
+# plot_poly_sigmoid(x=c40, y=percent, order=4, lbl="C40 poly sigmoid", offs=(16, 100), steepness=0.13) # Not as good
+# plot_poly_sigmoid(x=c40, y=percent, order=4, lbl="C40 poly sigmoid", offs=(13, 100), steepness=0.14) # Not as good
+plot_poly_sigmoid(x=c40, y=percent, order=4, lbl="C40 poly sigmoid", offs=(15, 100), steepness=0.17)
+
+
+
+
 plt.xlabel("Voltage in V")
 plt.ylabel("State of Charge in %")
 plt.legend(loc="upper left")
