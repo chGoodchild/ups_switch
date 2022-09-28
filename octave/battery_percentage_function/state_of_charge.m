@@ -39,7 +39,7 @@ plot(percent11, d100, 'bo', 'LineWidth', 1, 'MarkerSize', 7.5)
 ylabel("voltage")
 xlabel("percentage charge")
  title ("Charge vs Voltage Plot");
- h = legend ({"C/5"}, "C/10", "C/20", "C/40", "rest");
+h = legend ("C/5", "C/10", "C/20", "C/40", "rest");
  legend (h, "location", "northeastoutside");
  set (h, "fontsize", 14);
 hold off
