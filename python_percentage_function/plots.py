@@ -149,14 +149,34 @@ percent11 = [110, 100, 90, 80, 70, 60, 50, 40, 30, 20, 10]
 percentRest = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
 plt.scatter(c5, percent, label="C5")
-plot(x=c5, y=percent, order=3, lbl="C5 third order")
+#plot(x=c5, y=percent, order=3, lbl="C5")
 
 plt.scatter(c10, percent, label="C10")
-plot_poly_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 15", offs=(15, 100), steepness=0.13)
-
-
+#plot_poly_sigmoid(x=c10, y=percent, order=2, lbl="C10", offs=(15, 100), steepness=0.13)
 
 plt.scatter(c20, percent, label="C20")
+"""
+plot_sigmoid(x=c20, y=percent, order=2, lbl="C20 14", offs=(14, 100), steepness=0.13)
+plot_sigmoid(x=c20, y=percent, order=2, lbl="C20 14.5", offs=(14.5, 100), steepness=0.13)
+plot_sigmoid(x=c20, y=percent, order=2, lbl="C20 15.5", offs=(15.5, 100), steepness=0.13)
+plot_sigmoid(x=c20, y=percent, order=2, lbl="C20 16", offs=(16, 100), steepness=0.13)
+"""
+
+"""
+plot_sigmoid(x=c20, y=percent, order=2, lbl="C20 15", offs=(15, 100), steepness=0.08)
+plot_sigmoid(x=c20, y=percent, order=2, lbl="C20 15", offs=(15, 100), steepness=0.09)
+plot_sigmoid(x=c20, y=percent, order=2, lbl="C20 15", offs=(15, 100), steepness=0.10)
+plot_sigmoid(x=c20, y=percent, order=2, lbl="C20 15 11", offs=(15, 100), steepness=0.11)
+plot_sigmoid(x=c20, y=percent, order=2, lbl="C20 15", offs=(15, 100), steepness=0.12)
+plot_sigmoid(x=c20, y=percent, order=2, lbl="C20 15", offs=(15, 100), steepness=0.13)
+plot_sigmoid(x=c20, y=percent, order=2, lbl="C20 15", offs=(15, 100), steepness=0.14)
+plot_sigmoid(x=c20, y=percent, order=2, lbl="C20 15", offs=(15, 100), steepness=0.15)
+"""
+
+plot_sigmoid(x=c20, y=percent, order=2, lbl="C20 15 11", offs=(15, 100), steepness=0.11)
+plot_poly_sigmoid(x=c20, y=percent, order=2, lbl="C20 15 11", offs=(15, 100), steepness=0.11)
+
+
 #plot(x=c20, y=percent, order=2, lbl="C20")
 
 plt.scatter(c40, percent, label="C40")
