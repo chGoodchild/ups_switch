@@ -36,6 +36,54 @@ def get_fit(x, y, order):
     return alpha
 
 
+def sigmoid(x, steepness, xoffs, yoffs):
+    nx = x - xoffs
+    return (nx - steepness*nx) / (steepness - 2 * steepness * np.abs(nx) + 1) + yoffs
+
+
+def get_sigmoid_fit(x, y, order, offs, steepness):
+    neworder = 0
+    lst = []
+    for pwr in np.arange(order)[::-1]:
+        if pwr == 0:
+            lst.append(np.ones(len(x)))
+            neworder += 1
+        else:
+            lst.append(sigmoid(x, steepness=steepness, xoffs=offs[0], yoffs=offs[1]))
+            neworder += 1
+
+    A = np.vstack(lst).T
+    y = y[:, np.newaxis]
+    print(A)
+    print(y)
+    alpha = np.dot((np.dot(np.linalg.inv(np.dot(A.T, A)), A.T)), y)
+    return alpha, neworder
+
+
+def get_poly_sigmoid_fit(x, y, order, offs, steepness):
+    neworder = 0
+    lst = []
+    lst.append(sigmoid(x, steepness=steepness, xoffs=offs[0], yoffs=offs[1]))
+    neworder += 1
+
+    for pwr in np.arange(order)[::-1]:
+        if pwr == 0:
+            lst.append(np.ones(len(x)))
+            neworder += 1
+        elif pwr == 1:
+            lst.append(x)
+        else:
+            lst.append(np.array([xn ** pwr for xn in x]))
+            neworder += 1
+
+    A = np.vstack(lst).T
+    y = y[:, np.newaxis]
+    print(A)
+    print(y)
+    alpha = np.dot((np.dot(np.linalg.inv(np.dot(A.T, A)), A.T)), y)
+    return alpha, neworder
+
+
 def plot(x, y, order, lbl):
     alpha = get_fit(x, np.array(y), order)
     xnew = np.linspace(9, 17, 100)
@@ -43,6 +91,48 @@ def plot(x, y, order, lbl):
     ynew = 0
     for index, pow in zip(np.arange(order + 1), np.arange(order + 1)[::-1]):
         print("index: ", index, ", pow: ", pow + 1)
+        ynew += alpha[index] * xnew ** pow + 1
+
+    for i in np.arange(len(ynew)):
+        if ynew[i] < -10:
+            ynew[i] = -10
+        if ynew[i] > 130:
+            ynew[i] = 130
+
+    plt.plot(xnew, ynew, label=lbl)
+
+
+def plot_sigmoid(x, y, order, lbl, offs, steepness):
+    alpha, neworder = get_sigmoid_fit(np.array(x), np.array(y), order, offs, steepness=steepness)
+    xnew = np.linspace(9, 17, 100)
+
+    ynew = 0
+    for index, pow in zip(np.arange(neworder), np.arange(neworder)[::-1]):
+        if pow < 1:
+            ynew += alpha[index] * xnew ** pow + 1
+        else:
+            ynew += alpha[index] * sigmoid(np.array(xnew), steepness=steepness, xoffs=offs[0], yoffs=offs[1])
+
+    for i in np.arange(len(ynew)):
+        if ynew[i] < -10:
+            ynew[i] = -10
+        if ynew[i] > 130:
+            ynew[i] = 130
+
+    plt.plot(xnew, ynew, label=lbl)
+
+
+def plot_poly_sigmoid(x, y, order, lbl, offs, steepness):
+    alpha, neworder = get_poly_sigmoid_fit(np.array(x), np.array(y), order, offs, steepness=steepness)
+    xnew = np.linspace(9, 17, 100)
+
+    # TODO: Introduce sigmoid...
+
+    ynew = 0
+    ynew += alpha[0] * sigmoid(np.array(xnew), steepness=steepness, xoffs=offs[0], yoffs=offs[1])
+
+    alpha = alpha[1:]
+    for index, pow in zip(np.arange(neworder), np.arange(neworder)[::-1]):
         ynew += alpha[index] * xnew ** pow + 1
 
     for i in np.arange(len(ynew)):
@@ -62,15 +152,44 @@ plt.scatter(c5, percent, label="C5")
 plot(x=c5, y=percent, order=3, lbl="C5 third order")
 
 plt.scatter(c10, percent, label="C10")
-plot(x=c10, y=percent, order=2, lbl="C10")
+#plot(x=c10, y=percent, order=2, lbl="C10")
+"""
+plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 12", offs=(11, 100), steepness=0.14)
+plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 13", offs=(11.5, 100), steepness=0.14)
+plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 14", offs=(12, 100), steepness=0.14)
+plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 12.5", offs=(12.5, 100), steepness=0.14)
+plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 13", offs=(13, 100), steepness=0.14)
+plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 13.5", offs=(13.5, 100), steepness=0.14)
+plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 14", offs=(14, 100), steepness=0.14)
+"""
+
+"""
+plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 14.5", offs=(14.5, 100), steepness=0.14)
+plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 15.5", offs=(15.5, 100), steepness=0.14)
+plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 16", offs=(16, 100), steepness=0.14)
+"""
+
+"""
+plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 15", offs=(15, 100), steepness=0.11)
+plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 15", offs=(15, 100), steepness=0.12)
+plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 15", offs=(15, 100), steepness=0.13)
+plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 15", offs=(15, 100), steepness=0.14)
+"""
+
+# plot_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 15", offs=(15, 100), steepness=0.13)
+plot_poly_sigmoid(x=c10, y=percent, order=2, lbl="C10 sigmoid 15", offs=(15, 100), steepness=0.13)
+
+
 
 plt.scatter(c20, percent, label="C20")
-plot(x=c20, y=percent, order=2, lbl="C20")
+#plot(x=c20, y=percent, order=2, lbl="C20")
+
 plt.scatter(c40, percent, label="C40")
 plt.xlabel("Voltage in V")
 plt.ylabel("State of Charge in %")
 plt.legend(loc="upper left")
-plt.savefig("charge.pdf")
+# plt.savefig("charge.pdf")
+plt.show()
 
 plt.scatter(rest, percentRest, label="rest")
 
